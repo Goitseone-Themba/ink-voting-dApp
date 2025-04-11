@@ -11,6 +11,12 @@ mod voter_registry {
         voters: Mapping<AccountId, bool>,
     }
 
+    impl Default for VoterRegistry {
+        fn default() -> Self {
+            Self::new()
+        }
+    }
+
     impl VoterRegistry {
         #[ink(constructor)]
         pub fn new() -> Self {
@@ -26,7 +32,7 @@ mod voter_registry {
 
         #[ink(message)]
         pub fn is_voter(&self, voter: AccountId) -> bool {
-            self.voters.get(&voter).unwrap_or(false)
+            self.voters.get(voter).unwrap_or(false) // Removed the `&` before `voter`
         }
     }
 
@@ -36,10 +42,9 @@ mod voter_registry {
 
         #[ink::test]
         fn register_and_check_voter() {
-            // Set up the test environment
             let accounts = ink::env::test::default_accounts::<ink::env::DefaultEnvironment>();
             let mut contract = VoterRegistry::new();
-            let voter = accounts.alice; // Use a predefined account from the test environment
+            let voter = accounts.alice;
             contract.register_voter(voter);
             assert!(contract.is_voter(voter));
         }
